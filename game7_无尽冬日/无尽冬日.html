@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>无尽冬日 - 转转</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(180deg, #0a1628 0%, #1a3a5c 50%, #2d5a7b 100%);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .snow-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .snowflake {
+            position: absolute;
+            color: white;
+            font-size: 20px;
+            animation: fall linear infinite;
+            opacity: 0.8;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-10vh) rotate(0deg);
+            }
+            100% {
+                transform: translateY(110vh) rotate(360deg);
+            }
+        }
+
+        .game-container {
+            position: relative;
+            z-index: 2;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(100, 200, 255, 0.5);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #a8d8ea;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(100, 200, 255, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(100, 200, 255, 0.3);
+        }
+
+        .stat-card h3 {
+            font-size: 0.9rem;
+            color: #a8d8ea;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .stat-card.warning {
+            border-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .stat-card.danger {
+            border-color: #ff4757;
+            background: rgba(255, 71, 87, 0.2);
+            animation: pulse 1s infinite;
+        }
+
+        .stat-card.gold {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.15);
+        }
+
+        .stat-card.gold:hover {
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 200, 255, 0.2);
+        }
+
+        .section h2 {
+            color: #a8d8ea;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #1a3a5c 0%, #2d5a7b 100%);
+            border: 2px solid rgba(100, 200, 255, 0.5);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(100, 200, 255, 0.4);
+            border-color: #64c8ff;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #5c1a1a 0%, #7b2d2d 100%);
+            border-color: rgba(255, 100, 100, 0.5);
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            box-shadow: 0 8px 20px rgba(255, 100, 100, 0.4);
+            border-color: #ff6464;
+        }
+
+        .zhuanzhuan-section {
+            background: linear-gradient(135deg, rgba(46, 125, 50, 0.2) 0%, rgba(67, 160, 71, 0.2) 100%);
+            border-color: rgba(76, 175, 80, 0.4);
+        }
+
+        .zhuanzhuan-section h2 {
+            color: #81c784;
+        }
+
+        .recycle-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .recycle-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+
+        .recycle-item .item-info {
+            flex: 1;
+        }
+
+        .recycle-item .item-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #a8d8ea;
+        }
+
+        .recycle-item .item-description {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        .recycle-item .btn {
+            padding: 8px 15px;
+            font-size: 0.85rem;
+            margin-left: 10px;
+        }
+
+        .log-container {
+            max-height: 300px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .log-entry {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-entry .time {
+            color: #7f8c8d;
+            font-size: 0.8rem;
+            margin-right: 10px;
+        }
+
+        .log-entry.good {
+            color: #81c784;
+        }
+
+        .log-entry.bad {
+            color: #ff6b6b;
+        }
+
+        .log-entry.info {
+            color: #64c8ff;
+        }
+
+        .game-over-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .game-over-content {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, #1a3a5c 0%, #2d5a7b 100%);
+            border-radius: 20px;
+            border: 3px solid rgba(100, 200, 255, 0.5);
+            max-width: 500px;
+        }
+
+        .game-over-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .game-over-content p {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .game-over-content .survival-time {
+            font-size: 1.5rem;
+            color: #81c784;
+            margin: 20px 0;
+        }
+
+        .game-over-content .btn {
+            margin-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .action-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="snow-container" id="snowContainer"></div>
+
+    <div class="game-container">
+        <h1>❄️ 无尽冬日 ❄️</h1>
+        <p class="subtitle">在严酷的冬天中生存，使用转转回收系统</p>
+
+        <div class="stats-grid">
+            <div class="stat-card" id="healthCard">
+                <h3>❤️ 生命值</h3>
+                <div class="value" id="healthValue">100</div>
+            </div>
+            <div class="stat-card" id="hungerCard">
+                <h3>🍖 饥饿度</h3>
+                <div class="value" id="hungerValue">100</div>
+            </div>
+            <div class="stat-card" id="warmthCard">
+                <h3>🔥 温暖度</h3>
+                <div class="value" id="warmthValue">100</div>
+            </div>
+            <div class="stat-card">
+                <h3>⏰ 天数</h3>
+                <div class="value" id="dayValue">1</div>
+            </div>
+            <div class="stat-card gold" id="oldHeadCard">
+                <h3>🧓 旧首级</h3>
+                <div class="value" id="oldHeadValue">0</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🎮 行动</h2>
+            <div class="action-buttons">
+                <button class="btn" onclick="searchForFood()">🍖 寻找食物</button>
+                <button class="btn" onclick="gatherWood()">🪵 收集木材</button>
+                <button class="btn" onclick="buildFire()">🔥 生火</button>
+                <button class="btn" onclick="rest()">😴 休息</button>
+                <button class="btn btn-danger" onclick="explore()">🗺️ 探索</button>
+                <button class="btn" onclick="nextDay()">📅 下一天</button>
+            </div>
+        </div>
+
+        <div class="section zhuanzhuan-section">
+            <h2>♻️ 转转回收系统</h2>
+            <p style="margin-bottom: 15px; color: #c8e6c9;">将无用的物品转化为宝贵的资源！</p>
+            <div id="recycleItems">
+                <div class="recycle-item">
+                    <div class="item-info">
+                        <div class="item-name">🧣 旧围巾</div>
+                        <div class="item-description">将布料转化为保暖材料</div>
+                    </div>
+                    <button class="btn" onclick="recycleItem('scarf', 10, 5)">回收</button>
+                </div>
+                <div class="recycle-item">
+                    <div class="item-info">
+                        <div class="item-name">🪵 破木板</div>
+                        <div class="item-description">回收木材作为生火材料</div>
+                    </div>
+                    <button class="btn" onclick="recycleItem('planks', 5, 15)">回收</button>
+                </div>
+                <div class="recycle-item">
+                    <div class="item-info">
+                        <div class="item-name">🗑️ 散落的垃圾</div>
+                        <div class="item-description">寻找隐藏的宝藏和食物残渣</div>
+                    </div>
+                    <button class="btn" onclick="recycleItem('trash', 15, 0)">回收</button>
+                </div>
+                <div class="recycle-item">
+                    <div class="item-info">
+                        <div class="item-name">🧥 破旧外套</div>
+                        <div class="item-description">提取保暖材料</div>
+                    </div>
+                    <button class="btn" onclick="recycleItem('jacket', 15, 10)">回收</button>
+                </div>
+                <div class="recycle-item" style="border-color: rgba(255, 215, 0, 0.5); background: rgba(255, 215, 0, 0.1);">
+                    <div class="item-info">
+                        <div class="item-name">🧓 旧首级</div>
+                        <div class="item-description">回收旧首级获得大量温暖和生命值</div>
+                    </div>
+                    <button class="btn" onclick="recycleItem('oldhead', 25, 20)">回收</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📋 生存日志</h2>
+            <div class="log-container" id="logContainer">
+                <div class="log-entry info">
+                    <span class="time">第 1 天 - 早晨</span>
+                    你在严酷的冬天中醒来。转转回收系统是你唯一的希望。
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-over-overlay" id="gameOverOverlay">
+        <div class="game-over-content">
+            <h2 id="gameOverTitle">游戏结束</h2>
+            <p id="gameOverMessage">你没有活过这个冬天...</p>
+            <div class="survival-time">生存天数: <span id="survivalDays">0</span> 天</div>
+            <button class="btn" onclick="restartGame()">🔄 再试一次</button>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let gameState = {
+            health: 100,
+            hunger: 100,
+            warmth: 100,
+            day: 1,
+            wood: 5,
+            food: 2,
+            oldHead: 0,
+            gameOver: false
+        };
+
+        // Initialize snowflakes
+        function createSnowflakes() {
+            const container = document.getElementById('snowContainer');
+            const snowflakes = ['❄', '❅', '❆', '✻', '✼'];
+            
+            for (let i = 0; i < 50; i++) {
+                const snowflake = document.createElement('div');
+                snowflake.className = 'snowflake';
+                snowflake.textContent = snowflakes[Math.floor(Math.random() * snowflakes.length)];
+                snowflake.style.left = Math.random() * 100 + '%';
+                snowflake.style.animationDuration = (Math.random() * 5 + 5) + 's';
+                snowflake.style.animationDelay = (Math.random() * 10) + 's';
+                snowflake.style.fontSize = (Math.random() * 15 + 10) + 'px';
+                snowflake.style.opacity = Math.random() * 0.5 + 0.5;
+                container.appendChild(snowflake);
+            }
+        }
+
+        // Update UI
+        function updateUI() {
+            document.getElementById('healthValue').textContent = gameState.health;
+            document.getElementById('hungerValue').textContent = gameState.hunger;
+            document.getElementById('warmthValue').textContent = gameState.warmth;
+            document.getElementById('dayValue').textContent = gameState.day;
+            document.getElementById('oldHeadValue').textContent = gameState.oldHead;
+
+            // Update stat card styles
+            updateStatCard('healthCard', gameState.health);
+            updateStatCard('hungerCard', gameState.hunger);
+            updateStatCard('warmthCard', gameState.warmth);
+        }
+
+        function updateStatCard(cardId, value) {
+            const card = document.getElementById(cardId);
+            card.classList.remove('warning', 'danger');
+            
+            if (value <= 20) {
+                card.classList.add('danger');
+            } else if (value <= 40) {
+                card.classList.add('warning');
+            }
+        }
+
+        // Add log entry
+        function addLog(message, type = 'info') {
+            const logContainer = document.getElementById('logContainer');
+            const time = `第 ${gameState.day} 天`;
+            
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.innerHTML = `<span class="time">${time}</span> ${message}`;
+            
+            logContainer.insertBefore(entry, logContainer.firstChild);
+            
+            // Keep only last 50 entries
+            while (logContainer.children.length > 50) {
+                logContainer.removeChild(logContainer.lastChild);
+            }
+        }
+
+        // Actions
+        function searchForFood() {
+            if (gameState.gameOver) return;
+            
+            const foodFound = Math.floor(Math.random() * 3) + 1;
+            const energyCost = 10;
+            
+            gameState.hunger -= energyCost;
+            gameState.food += foodFound;
+            gameState.health -= 5;
+            
+            addLog(`找到了 ${foodFound} 个食物！(-${energyCost} 饥饿度)`, 'good');
+            
+            checkGameState();
+            updateUI();
+        }
+
+        function gatherWood() {
+            if (gameState.gameOver) return;
+            
+            const woodFound = Math.floor(Math.random() * 4) + 2;
+            const energyCost = 15;
+            
+            gameState.hunger -= energyCost;
+            gameState.wood += woodFound;
+            gameState.health -= 5;
+            gameState.warmth -= 5;
+            
+            addLog(`收集了 ${woodFound} 块木材！(-${energyCost} 饥饿度)`, 'good');
+            
+            checkGameState();
+            updateUI();
+        }
+
+        function buildFire() {
+            if (gameState.gameOver) return;
+            
+            if (gameState.wood < 2) {
+                addLog('木材不足！需要至少 2 块木材。', 'bad');
+                return;
+            }
+            
+            gameState.wood -= 2;
+            const warmthGain = 30;
+            gameState.warmth = Math.min(100, gameState.warmth + warmthGain);
+            
+            addLog(`生火成功！温暖度增加了 ${warmthGain}。`, 'good');
+            
+            checkGameState();
+            updateUI();
+        }
+
+        function rest() {
+            if (gameState.gameOver) return;
+            
+            const healthGain = 20;
+            const hungerCost = 10;
+            
+            gameState.health = Math.min(100, gameState.health + healthGain);
+            gameState.hunger -= hungerCost;
+            gameState.warmth -= 10;
+            
+            addLog(`休息恢复了 ${healthGain} 生命值。(-${hungerCost} 饥饿度)`, 'good');
+            
+            checkGameState();
+            updateUI();
+        }
+
+        function explore() {
+            if (gameState.gameOver) return;
+            
+            const outcomes = [
+                { message: '发现了一个废弃的营地！', health: -10, hunger: -15, warmth: -15, bonus: '食物: 2, 木材: 3' },
+                { message: '遇到了暴风雪！', health: -20, hunger: -10, warmth: -30, bonus: null },
+                { message: '发现了一个隐藏的避难所！', health: 0, hunger: -5, warmth: 10, bonus: '食物: 1' },
+                { message: '没有发现有用的东西。', health: -5, hunger: -10, warmth: -10, bonus: null },
+                { message: '发现了冷冻的浆果！', health: -10, hunger: -15, warmth: -15, bonus: '食物: 3' },
+                { message: '发现了一个神秘的旧首级！', health: -5, hunger: -10, warmth: -10, bonus: '旧首级: 1' }
+            ];
+            
+            const outcome = outcomes[Math.floor(Math.random() * outcomes.length)];
+            
+            gameState.health += outcome.health;
+            gameState.hunger += outcome.hunger;
+            gameState.warmth += outcome.warmth;
+            
+            if (outcome.bonus) {
+                const bonusParts = outcome.bonus.split(', ');
+                bonusParts.forEach(part => {
+                    const [resource, amount] = part.split(': ');
+                    if (resource === '食物') gameState.food += parseInt(amount);
+                    if (resource === '木材') gameState.wood += parseInt(amount);
+                    if (resource === '老干') gameState.oldHead += parseInt(amount);
+                });
+            }
+            
+            addLog(`${outcome.message} ${outcome.bonus ? `(${outcome.bonus})` : ''}`, outcome.health < 0 ? 'bad' : 'good');
+            
+            checkGameState();
+            updateUI();
+        }
+
+        function nextDay() {
+            if (gameState.gameOver) return;
+            
+            // Daily survival costs
+            gameState.hunger -= 20;
+            gameState.warmth -= 15;
+            gameState.health -= 5;
+            
+            gameState.day++;
+            
+            addLog(`第 ${gameState.day} 天开始了。气温进一步下降...`, 'info');
+            
+            checkGameState();
+            updateUI();
+        }
+
+        // Zhuanzhuan Recycle System
+        function recycleItem(item, warmthGain, healthGain) {
+            if (gameState.gameOver) return;
+            
+            const energyCost = 10;
+            gameState.hunger -= energyCost;
+            
+            let message = '';
+            
+            switch(item) {
+                case 'scarf':
+                    gameState.warmth = Math.min(100, gameState.warmth + warmthGain);
+                    message = '将旧围巾回收成保暖材料！';
+                    break;
+                case 'planks':
+                    gameState.wood += 3;
+                    gameState.warmth = Math.min(100, gameState.warmth + warmthGain);
+                    message = '从破木板中回收了木材！';
+                    break;
+                case 'trash':
+                    const foundFood = Math.random() > 0.5;
+                    if (foundFood) {
+                        gameState.food += 1;
+                        message = '在垃圾中找到了食物残渣！';
+                    } else {
+                        message = '翻找垃圾，没有发现有用的东西。';
+                    }
+                    break;
+                case 'jacket':
+                    gameState.warmth = Math.min(100, gameState.warmth + warmthGain);
+                    gameState.health = Math.min(100, gameState.health + healthGain);
+                    message = '从破旧外套中提取了保暖材料！';
+                    break;
+                case 'oldhead':
+                    gameState.warmth = Math.min(100, gameState.warmth + warmthGain);
+                    gameState.health = Math.min(100, gameState.health + healthGain);
+                    message = '成功回收旧首级，获得了大量温暖和生命值！';
+                    break;
+            }
+            
+            addLog(`${message} (-${energyCost} 饥饿度)`, 'good');
+            
+            checkGameState();
+            updateUI();
+        }
+
+        // Game state checks
+        function checkGameState() {
+            // Constrain values
+            gameState.health = Math.max(0, Math.min(100, gameState.health));
+            gameState.hunger = Math.max(0, Math.min(100, gameState.hunger));
+            gameState.warmth = Math.max(0, Math.min(100, gameState.warmth));
+            gameState.oldHead = Math.max(0, gameState.oldHead);
+            
+            // Check game over conditions
+            if (gameState.health <= 0) {
+                endGame('你因伤势过重而死亡。');
+            } else if (gameState.hunger <= 0) {
+                endGame('你饿死了。');
+            } else if (gameState.warmth <= 0) {
+                endGame('你冻死了。');
+            }
+        }
+
+        function endGame(message) {
+            gameState.gameOver = true;
+            
+            document.getElementById('gameOverMessage').textContent = message;
+            document.getElementById('survivalDays').textContent = gameState.day;
+            document.getElementById('gameOverOverlay').style.display = 'flex';
+            
+            // Determine title based on survival time
+            const title = gameState.day > 10 ? '你活下来了！' : '游戏结束';
+            document.getElementById('gameOverTitle').textContent = title;
+        }
+
+        function restartGame() {
+            gameState = {
+                health: 100,
+                hunger: 100,
+                warmth: 100,
+                day: 1,
+                wood: 5,
+                food: 2,
+                oldHead: 0,
+                gameOver: false
+            };
+            
+            document.getElementById('gameOverOverlay').style.display = 'none';
+            document.getElementById('logContainer').innerHTML = `
+                <div class="log-entry info">
+                    <span class="time">第 1 天 - 早晨</span>
+                    你在严酷的冬天中醒来。转转回收系统是你唯一的希望。
+                </div>
+            `;
+            
+            updateUI();
+        }
+
+        // Initialize game
+        createSnowflakes();
+        updateUI();
+    </script>
+</body>
+</html>
