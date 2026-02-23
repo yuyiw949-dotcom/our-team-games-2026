@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>合成大西瓜</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'ZCOOL KuaiLe', cursive;
+            overflow: hidden;
+            padding: 10px;
+        }
+        
+        .game-title {
+            color: #fff;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 200, 100, 0.8), 0 4px 8px rgba(0,0,0,0.5);
+            letter-spacing: 4px;
+        }
+        
+        .score-board {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 10px;
+        }
+        
+        .score-item {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 10px 25px;
+            border-radius: 25px;
+            color: #fff;
+            font-size: 1.1rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .score-item span {
+            color: #ffd700;
+            font-size: 1.3rem;
+        }
+        
+        .game-container {
+            position: relative;
+            background: linear-gradient(180deg, #2d1f3d 0%, #1a1a2e 100%);
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 0 60px rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+        }
+        
+        canvas {
+            display: block;
+            cursor: pointer;
+        }
+        
+        .game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+        
+        .game-over.show {
+            display: flex;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .game-over h2 {
+            font-size: 3rem;
+            color: #ff6b6b;
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px rgba(255, 107, 107, 0.8);
+        }
+        
+        .game-over p {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+        }
+        
+        .game-over button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.5);
+        }
+        
+        .game-over button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.7);
+        }
+        
+        .next-fruit {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 15px;
+            color: #fff;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .next-fruit-preview {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+        
+        .hint {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 1.5rem;
+            pointer-events: none;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+        
+        .footer {
+            margin-top: 15px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="game-title">🍉 合成大西瓜 🍉</h1>
+    
+    <div class="score-board">
+        <div class="score-item">得分: <span id="score">0</span></div>
+        <div class="score-item">最高分: <span id="bestScore">0</span></div>
+    </div>
+    
+    <div class="game-container">
+        <canvas id="gameCanvas"></canvas>
+        <div class="next-fruit">
+            下一个: <div class="next-fruit-preview" id="nextFruit"></div>
+        </div>
+        <div class="hint" id="hint">点击放置水果</div>
+        <div class="game-over" id="gameOver">
+            <h2>游戏结束!</h2>
+            <p>最终得分: <span id="finalScore">0</span></p>
+            <button onclick="restartGame()">再玩一次</button>
+        </div>
+    </div>
+    
+    <div class="footer">点击屏幕放置水果，相同水果合并升级</div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // 游戏配置
+        const GAME_WIDTH = 400;
+        const GAME_HEIGHT = 600;
+        canvas.width = GAME_WIDTH;
+        canvas.height = GAME_HEIGHT;
+        
+        // 水果配置
+        const FRUITS = [
+            { name: '樱桃', emoji: '🍒', radius: 18, color: '#ff4444', score: 2 },
+            { name: '草莓', emoji: '🍓', radius: 24, color: '#ff6b6b', score: 4 },
+            { name: '葡萄', emoji: '🍇', radius: 30, color: '#9b59b6', score: 8 },
+            { name: '橘子', emoji: '🍊', radius: 36, color: '#f39c12', score: 16 },
+            { name: '苹果', emoji: '🍎', radius: 42, color: '#e74c3c', score: 32 },
+            { name: '梨', emoji: '🍐', radius: 48, color: '#f1c40f', score: 64 },
+            { name: '桃子', emoji: '🍑', radius: 54, color: '#ffb6c1', score: 128 },
+            { name: '菠萝', emoji: '🍍', radius: 60, color: '#f39c12', score: 256 },
+            { name: '哈密瓜', emoji: '🍈', radius: 66, color: '#90ee90', score: 512 },
+            { name: '西瓜', emoji: '🍉', radius: 75, color: '#2ecc71', score: 1024 }
+        ];
+        
+        // 游戏状态
+        let fruits = [];
+        let score = 0;
+        let bestScore = localStorage.getItem('watermelonBestScore') || 0;
+        let currentFruitType = 0;
+        let nextFruitType = Math.floor(Math.random() * 5);
+        let canDrop = true;
+        let dropCooldown = 500;
+        let gameOver = false;
+        let hintVisible = true;
+        
+        // 更新最高分显示
+        document.getElementById('bestScore').textContent = bestScore;
+        
+        // 物理参数
+        const GRAVITY = 0.4;
+        const DAMPING = 0.3;
+        const FRICTION = 0.98;
+        
+        // 水果类
+        class Fruit {
+            constructor(x, y, type) {
+                this.x = x;
+                this.y = y;
+                this.type = type;
+                this.radius = FRUITS[type].radius;
+                this.vx = 0;
+                this.vy = 0;
+                this.merged = false;
+                this.emoji = FRUITS[type].emoji;
+                this.color = FRUITS[type].color;
+            }
+            
+            update() {
+                // 应用重力
+                this.vy += GRAVITY;
+                
+                // 应用速度
+                this.x += this.vx;
+                this.y += this.vy;
+                
+                // 摩擦力
+                this.vx *= FRICTION;
+                
+                // 边界碰撞
+                if (this.x - this.radius < 0) {
+                    this.x = this.radius;
+                    this.vx *= -DAMPING;
+                }
+                if (this.x + this.radius > GAME_WIDTH) {
+                    this.x = GAME_WIDTH - this.radius;
+                    this.vx *= -DAMPING;
+                }
+                if (this.y + this.radius > GAME_HEIGHT) {
+                    this.y = GAME_HEIGHT - this.radius;
+                    this.vy *= -DAMPING;
+                    this.vx *= 0.8;
+                }
+                
+                // 顶部边界（游戏结束检测）
+                if (this.y - this.radius < 50 && Math.abs(this.vy) < 0.5 && !this.merged) {
+                    // 检查是否堆积到顶部
+                    let stacked = fruits.filter(f => f !== this && f.y < 100 && !f.merged);
+                    if (stacked.length > 3) {
+                        endGame();
+                    }
+                }
+            }
+            
+            draw() {
+                ctx.save();
+                
+                // 绘制水果阴影
+                ctx.beginPath();
+                ctx.arc(this.x + 3, this.y + 3, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+                ctx.fill();
+                
+                // 绘制水果主体
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                const gradient = ctx.createRadialGradient(
+                    this.x - this.radius * 0.3, 
+                    this.y - this.radius * 0.3, 
+                    0,
+                    this.x, 
+                    this.y, 
+                    this.radius
+                );
+                gradient.addColorStop(0, this.lightenColor(this.color, 50));
+                gradient.addColorStop(1, this.color);
+                ctx.fillStyle = gradient;
+                ctx.fill();
+                
+                // 绘制水果边框
+                ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                // 绘制emoji
+                ctx.font = `${this.radius * 1.2}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(this.emoji, this.x, this.y + 2);
+                
+                ctx.restore();
+            }
+            
+            lightenColor(color, percent) {
+                const num = parseInt(color.replace('#', ''), 16);
+                const amt = Math.round(2.55 * percent);
+                const R = (num >> 16) + amt;
+                const G = (num >> 8 & 0x00FF) + amt;
+                const B = (num & 0x0000FF) + amt;
+                return '#' + (0x1000000 + 
+                    (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 + 
+                    (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 + 
+                    (B < 255 ? B < 1 ? 0 : B : 255)
+                ).toString(16).slice(1);
+            }
+        }
+        
+        // 碰撞检测
+        function checkCollision(f1, f2) {
+            const dx = f2.x - f1.x;
+            const dy = f2.y - f1.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            return distance < f1.radius + f2.radius;
+        }
+        
+        // 处理碰撞
+        function handleCollisions() {
+            for (let i = 0; i < fruits.length; i++) {
+                for (let j = i + 1; j < fruits.length; j++) {
+                    const f1 = fruits[i];
+                    const f2 = fruits[j];
+                    
+                    if (f1.merged || f2.merged) continue;
+                    
+                    if (checkCollision(f1, f2)) {
+                        // 相同类型水果合并
+                        if (f1.type === f2.type && f1.type < FRUITS.length - 1) {
+                            // 计算合并后的位置
+                            const newX = (f1.x + f2.x) / 2;
+                            const newY = (f1.y + f2.y) / 2;
+                            
+                            // 标记为已合并
+                            f1.merged = true;
+                            f2.merged = true;
+                            
+                            // 创建新水果
+                            const newType = f1.type + 1;
+                            const newFruit = new Fruit(newX, newY, newType);
+                            fruits.push(newFruit);
+                            
+                            // 添加分数
+                            score += FRUITS[newType].score;
+                            document.getElementById('score').textContent = score;
+                            
+                            // 更新最高分
+                            if (score > bestScore) {
+                                bestScore = score;
+                                localStorage.setItem('watermelonBestScore', bestScore);
+                                document.getElementById('bestScore').textContent = bestScore;
+                            }
+                            
+                            // 合并特效
+                            createMergeEffect(newX, newY, FRUITS[newType].color);
+                        } else {
+                            // 不同类型水果分离
+                            const dx = f2.x - f1.x;
+                            const dy = f2.y - f1.y;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+                            const overlap = (f1.radius + f2.radius) - distance;
+                            
+                            if (distance > 0) {
+                                const nx = dx / distance;
+                                const ny = dy / distance;
+                                
+                                // 分离位置
+                                f1.x -= nx * overlap * 0.5;
+                                f1.y -= ny * overlap * 0.5;
+                                f2.x += nx * overlap * 0.5;
+                                f2.y += ny * overlap * 0.5;
+                                
+                                // 交换速度
+                                const tempVx = f1.vx;
+                                const tempVy = f1.vy;
+                                f1.vx = f2.vx * 0.8;
+                                f1.vy = f2.vy * 0.8;
+                                f2.vx = tempVx * 0.8;
+                                f2.vy = tempVy * 0.8;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // 移除已合并的水果
+            fruits = fruits.filter(f => !f.merged);
+        }
+        
+        // 合并特效
+        let effects = [];
+        function createMergeEffect(x, y, color) {
+            for (let i = 0; i < 8; i++) {
+                const angle = (Math.PI * 2 / 8) * i;
+                effects.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * 3,
+                    vy: Math.sin(angle) * 3,
+                    radius: 5,
+                    color: color,
+                    life: 1
+                });
+            }
+        }
+        
+        // 更新特效
+        function updateEffects() {
+            effects = effects.filter(e => {
+                e.x += e.vx;
+                e.y += e.vy;
+                e.life -= 0.05;
+                return e.life > 0;
+            });
+        }
+        
+        // 绘制特效
+        function drawEffects() {
+            effects.forEach(e => {
+                ctx.beginPath();
+                ctx.arc(e.x, e.y, e.radius * e.life, 0, Math.PI * 2);
+                ctx.fillStyle = e.color;
+                ctx.globalAlpha = e.life;
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            });
+        }
+        
+        // 绘制预览水果
+        function drawPreview(x) {
+            if (!canDrop || gameOver) return;
+            
+            const fruit = FRUITS[currentFruitType];
+            ctx.save();
+            ctx.globalAlpha = 0.6;
+            
+            // 绘制虚线引导
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(x, 60);
+            ctx.lineTo(x, GAME_HEIGHT);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // 绘制预览水果
+            ctx.beginPath();
+            ctx.arc(x, 50, fruit.radius, 0, Math.PI * 2);
+            ctx.fillStyle = fruit.color;
+            ctx.fill();
+            
+            ctx.font = `${fruit.radius * 1.2}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(fruit.emoji, x, 52);
+            
+            ctx.restore();
+        }
+        
+        // 更新下一个水果显示
+        function updateNextFruit() {
+            const preview = document.getElementById('nextFruit');
+            const fruit = FRUITS[nextFruitType];
+            preview.textContent = fruit.emoji;
+            preview.style.background = `radial-gradient(circle, ${fruit.color}44, ${fruit.color}22)`;
+        }
+        
+        // 放置水果
+        function dropFruit(x) {
+            if (!canDrop || gameOver) return;
+            
+            // 限制x范围
+            const fruit = FRUITS[currentFruitType];
+            x = Math.max(fruit.radius + 5, Math.min(GAME_WIDTH - fruit.radius - 5, x));
+            
+            const newFruit = new Fruit(x, 50, currentFruitType);
+            fruits.push(newFruit);
+            
+            canDrop = false;
+            document.getElementById('hint').style.display = 'none';
+            
+            // 更新下一个水果
+            currentFruitType = nextFruitType;
+            nextFruitType = Math.floor(Math.random() * 5);
+            updateNextFruit();
+            
+            setTimeout(() => {
+                canDrop = true;
+            }, dropCooldown);
+        }
+        
+        // 游戏结束
+        function endGame() {
+            gameOver = true;
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('gameOver').classList.add('show');
+        }
+        
+        // 重新开始
+        function restartGame() {
+            fruits = [];
+            effects = [];
+            score = 0;
+            canDrop = true;
+            gameOver = false;
+            currentFruitType = 0;
+            nextFruitType = Math.floor(Math.random() * 5);
+            
+            document.getElementById('score').textContent = '0';
+            document.getElementById('gameOver').classList.remove('show');
+            document.getElementById('hint').style.display = 'block';
+            updateNextFruit();
+        }
+        
+        // 绘制背景
+        function drawBackground() {
+            // 渐变背景
+            const gradient = ctx.createLinearGradient(0, 0, 0, GAME_HEIGHT);
+            gradient.addColorStop(0, '#2d1f3d');
+            gradient.addColorStop(1, '#1a1a2e');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+            
+            // 顶部危险线
+            ctx.beginPath();
+            ctx.moveTo(0, 80);
+            ctx.lineTo(GAME_WIDTH, 80);
+            ctx.strokeStyle = 'rgba(255, 100, 100, 0.3)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([10, 5]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // 容器边框
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        }
+        
+        // 游戏主循环
+        let mouseX = GAME_WIDTH / 2;
+        function gameLoop() {
+            // 绘制背景
+            drawBackground();
+            
+            if (!gameOver) {
+                // 更新水果
+                fruits.forEach(fruit => fruit.update());
+                
+                // 处理碰撞
+                handleCollisions();
+                
+                // 更新特效
+                updateEffects();
+            }
+            
+            // 绘制水果
+            fruits.forEach(fruit => fruit.draw());
+            
+            // 绘制特效
+            drawEffects();
+            
+            // 绘制预览
+            if (!gameOver) {
+                drawPreview(mouseX);
+            }
+            
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // 事件监听
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouseX = e.clientX - rect.left;
+        });
+        
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            dropFruit(x);
+        });
+        
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const x = e.touches[0].clientX - rect.left;
+            mouseX = x;
+            dropFruit(x);
+        });
+        
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            mouseX = e.touches[0].clientX - rect.left;
+        });
+        
+        // 初始化
+        updateNextFruit();
+        gameLoop();
+    </script>
+</body>
+</html>
