@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小游戏合集 - yuyiw949-dotcom</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            padding: 20px 0;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .game-preview {
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .game-info {
+            padding: 20px;
+        }
+
+        .game-number {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .game-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .game-description {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .play-btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: opacity 0.3s;
+        }
+
+        .play-btn:hover {
+            opacity: 0.9;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            color: white;
+            opacity: 0.8;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 小游戏合集</h1>
+            <p>精选 9 款经典小游戏，点击即可开始游戏</p>
+        </div>
+
+        <div class="games-grid">
+            <!-- 游戏1: 贪吃蛇 -->
+            <div class="game-card" onclick="location.href='game1_snake/index.html'">
+                <div class="game-preview">🐍</div>
+                <div class="game-info">
+                    <span class="game-number">Game 1</span>
+                    <h3 class="game-title">贪吃蛇</h3>
+                    <p class="game-description">经典贪吃蛇游戏，控制蛇吃食物，避免撞到墙壁和自己。简单有趣，考验反应速度！</p>
+                    <a href="game1_snake/index.html" class="play-btn">开始游戏 →</a>
+                </div>
+            </div>
+
+            <!-- 游戏2: 俄罗斯方块 -->
+            <div class="game-card" onclick="location.href='game2_tetris/index.html'">
+                <div class="game-preview">🧱</div>
+                <div class="game-info">
+                    <span class="game-number">Game 2</span>
+                    <h3 class="game-title">俄罗斯方块</h3>
+                    <p class="game-description">世界上最经典的益智游戏之一，旋转和移动方块，填满一行即可消除得分。</p>
+                    <a href="game2_tetris/index.html" class="play-btn">开始游戏 →</a>
+                </div>
+            </div>
+
+            <!-- 游戏3: 2048 -->
+            <div class="game-card" onclick="location.href='game3_2048/index.html'">
+                <div class="game-preview">🔢</div>
+                <div class="game-info">
+                    <span class="game-number">Game 3</span>
+                    <h3 class="game-title">2048</h3>
+                    <p class="game-description">数字合成益智游戏，滑动方块使相同数字合并，目标是合成出 2048 这个数字。</p>
+                    <a href="game3_2048/index.html" class="play-btn">开始游戏 →</a>
+                </div>
+            </div>
+
+            <!-- 游戏4: 五子棋 -->
+            <div class="game-card" onclick="location.href='game4_五子棋/index.html'">
+                <div class="game-preview">⚫</div>
+                <div class="game-info">
+                    <span class="game-number">Game 4</span>
+                    <h3 class="game-title">五子棋</h3>
+                    <p class="game-description">传统策略棋类游戏，黑白交替落子，先连成五子者获胜。简单易学，变化无穷。</p>
+                    <a href="game4_五子棋/index.html" class="play-btn">开始游戏 →</a>
+                </div>
+            </div>
+
+            <!-- 游戏5: 拼图游戏 -->
+            <div class="game-card" onclick="location.href='game5_puzzle-game/index.html'">
+                <div class="game-preview">🧩</div>
+                <div class="game-info">
+                    <span class="game-number">Game 5</span>
+                    <h3 class="game-title">拼图游戏</h3>
+                    <p class="game-description">经典拼图益智游戏，打乱的图片需要你重新拼凑完整。锻炼观察力和空间思维。</p>
+                    <a href="game5_puzzle-game/index.html" class="play-btn">开始游戏 →</a>
+                </div>
+            </div>
+
+            <!-- 游戏6: 坦克大战 -->
+            <div class="game-card" onclick="location.href='game6_tank-battle/index.html'">
+                <div class="game-preview">🚜</div>
+                <div class="game-info">
+                    <span class="game-number">Game 6</span>
+                    <h3 class="game-title">坦克大战</h3>
+                    <p class="game-description">经典坦克射击游戏，控制坦克消灭敌人，保护基地。怀旧经典，回味无穷。</p>
+                    <a href="game6_tank-battle/index.html" class="play-btn">开始游戏 →</a>
+                </div>
+            </div>
+
+            <!-- 游戏7: 无尽冬日 -->
+            <div class="game-card" onclick="location.href='game7_无尽冬日/index.html'">
+                <div class="game-preview">❄️</div>
+                <div class="game-info">
+                    <span class="game-number">Game 7</span>
+                    <h3 class="game-title">无尽冬日</h3>
+                    <p class="game-description">冰天雪地的生存挑战游戏，在严寒中寻找资源，建立避难所，生存下去。</p>
+                    <a href="game7_无尽冬日/index.html" class="play-btn">开始游戏 →</a>
+                </div>
+            </div>
+
+            <!-- 游戏8: 奇迹暖暖 -->
+            <div class="game-card" onclick="location.href='game8_奇迹暖暖/index.html'">
+                <div class="game-preview">👗</div>
+                <div class="game-info">
+                    <span class="game-number">Game 8</span>
+                    <h3 class="game-title">奇迹暖暖</h3>
+                    <p class="game-description">时尚换装游戏，为角色搭配各种服装和饰品，展现你的时尚品味。</p>
+                    <a href="game8_奇迹暖暖/index.html" class="play-btn">开始游戏 →</a>
+                </div>
+            </div>
+
+            <!-- 游戏9: 合成大西瓜 -->
+            <div class="game-card" onclick="location.href='game9_合成大西瓜/index.html'">
+                <div class="game-preview">🍉</div>
+                <div class="game-info">
+                    <span class="game-number">Game 9</span>
+                    <h3 class="game-title">合成大西瓜</h3>
+                    <p class="game-description">有趣的物理合成游戏，从最小的水果开始合成，目标是合成出最大的大西瓜！</p>
+                    <a href="game9_合成大西瓜/index.html" class="play-btn">开始游戏 →</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2025 yuyiw949-dotcom | <a href="https://github.com/yuyiw949-dotcom" target="_blank">GitHub 仓库</a></p>
+        </div>
+    </div>
+</body>
+</html>
