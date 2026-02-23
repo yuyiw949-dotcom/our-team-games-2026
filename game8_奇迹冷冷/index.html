@@ -862,149 +862,167 @@ function backToGenderSelect() {
     document.getElementById('gender-select').classList.remove('hidden');
     currentGender = 'female';
 }
+ // 更新角色外观
+   function updateCharacterAppearance() {
+       // 更新头发
+       document.getElementById('hair-back').innerHTML =
+   hairStyles[currentGender].back;
+       document.getElementById('hair-front').innerHTML =
+   hairStyles[currentGender].front;
 
-// 更新角色外观
-function updateCharacterAppearance() {
-    // 更新头发
-    document.getElementById('hair-back').innerHTML = hairStyles[currentGender].back;
-    document.getElementById('hair-front').innerHTML = hairStyles[currentGender].front;
-    
-    // 更新嘴巴样式
-    const mouth = document.getElementById('mouth');
-    if (currentGender === 'female') {
-        mouth.setAttribute('d', 'M 130 105 Q 150 115 170 105');
-        mouth.setAttribute('stroke', '#FF6B9D');
-    } else {
-        mouth.setAttribute('d', 'M 135 105 Q 150 110 165 105');
-        mouth.setAttribute('stroke', '#4A4A4A');
-    }
-    
-    // 更新所有服装
-    updateAllClothing();
-}
+       // 更新嘴巴样式
+       const mouth = document.getElementById('mouth');
+       if (currentGender === 'female') {
+           mouth.setAttribute('d', 'M 130 105 Q 150 115 170
+   105');
+           mouth.setAttribute('stroke', '#FF6B9D');
+       } else {
+           mouth.setAttribute('d', 'M 135 105 Q 150 110 165
+   105');
+           mouth.setAttribute('stroke', '#4A4A4A');
+       }
 
-// 更新所有服装
-function updateAllClothing() {
-    // 更新配饰
-    updateItemLayer('hat', selectedItems.hat);
-    updateItemLayer('glasses', selectedItems.glasses);
-    updateItemLayer('necklace', selectedItems.necklace);
-    
-    // 更新鞋子
-    updateItemLayer('shoes', selectedItems.shoes);
-    
-    // 处理连衣裙逻辑
-    if (selectedItems.dress && selectedItems.dress !== 'none') {
-        // 有连衣裙，隐藏上衣和裤子
-        updateItemLayer('dress', selectedItems.dress);
-        document.getElementById('top').style.display = 'none';
-        document.getElementById('bottom').style.display = 'none';
-    } else {
-        // 没有连衣裙，显示上衣和裤子
-        document.getElementById('top').style.display = 'block';
-        document.getElementById('bottom').style.display = 'block';
-        document.getElementById('dress').style.display = 'none';
-        
-        updateItemLayer('top', selectedItems.top);
-        updateItemLayer('bottom', selectedItems.bottom);
-    }
-}
+       // 更新所有服装
+       updateAllClothing();
+   }
 
-// 更新单层服装
-function updateItemLayer(layerId, itemId) {
-    const layer = document.getElementById(layerId);
-    if (itemId && itemId !== 'none') {
-        const item = clothingItems[layerId].find(i => i.id === itemId);
-        if (item) {
-            layer.innerHTML = item.svg;
-            layer.style.display = 'block';
-        }
-    } else {
-        layer.innerHTML = '';
-        layer.style.display = 'none';
-    }
-}
+   // 更新所有服装
+   function updateAllClothing() {
+       // 更新配饰
+       updateItemLayer('hat', selectedItems.hat);
+       updateItemLayer('glasses', selectedItems.glasses);
+       updateItemLayer('necklace', selectedItems.necklace);
 
-// 显示分类
-function showCategory(category) {
-    currentCategory = category;
-    
-    // 更新标签状态
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.dataset.category === category) {
-            btn.classList.add('active');
-        }
-    });
-    
-    // 显示分类中的物品
-    const itemsGrid = document.getElementById('items-grid');
-    itemsGrid.innerHTML = '';
-    
-    const items = clothingItems[category];
-    items.forEach(item => {
-        const itemCard = document.createElement('div');
-        itemCard.className = 'item-card';
-        if (selectedItems[category] === item.id) {
-            itemCard.classList.add('selected');
-        }
-        
-        // 创建预览SVG
-        let previewSvg = '';
-        if (item.svg) {
-            previewSvg = `<svg viewBox="0 0 300 400">${item.svg}</svg>`;
-        } else {
-            previewSvg = `<svg viewBox="0 0 60 60">
-                <circle cx="30" cy="30" r="25" fill="#f0f0f0" stroke="#ddd" stroke-width="2"/>
-                <text x="30" y="35" text-anchor="middle" fill="#999" font-size="20">×</text>
-            </svg>`;
-        }
-        
-        itemCard.innerHTML = `
-            ${previewSvg}
-            <span>${item.name}</span>
-        `;
-        
-        itemCard.addEventListener('click', () => selectItem(category, item.id));
-        itemsGrid.appendChild(itemCard);
-    });
-}
+       // 更新鞋子
+       updateItemLayer('shoes', selectedItems.shoes);
 
-// 选择物品
-function selectItem(category, itemId) {
-    selectedItems[category] = itemId;
-    
-    // 如果选择了连衣裙，清空上衣和裤子
-    if (category === 'dress' && itemId !== 'none') {
-        selectedItems.top = null;
-        selectedItems.bottom = null;
-    }
-    
-    // 如果选择了上衣或裤子，清空连衣裙
-    if ((category === 'top' || category === 'bottom') && itemId !== 'none') {
-        selectedItems.dress = null;
-    }
-    
-    // 更新角色外观
-    updateAllClothing();
-    
-    // 重新显示当前分类以更新选中状态
-    showCategory(category);
-}
+       // 处理连衣裙逻辑
+       if (selectedItems.dress && selectedItems.dress !==
+   'none') {
+           // 有连衣裙，隐藏上衣和裤子
+           updateItemLayer('dress', selectedItems.dress);
+           document.getElementById('top').style.display =
+   'none';
+           document.getElementById('bottom').style.display =
+   'none';
+       } else {
+           // 没有连衣裙，显示上衣和裤子
+           document.getElementById('top').style.display =
+   'block';
+           document.getElementById('bottom').style.display =
+   'block';
+           document.getElementById('dress').style.display =
+   'none';
 
-// 初始化标签点击事件
-document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const category = btn.dataset.category;
-        showCategory(category);
-    });
-});
+           updateItemLayer('top', selectedItems.top);
+           updateItemLayer('bottom', selectedItems.bottom);
+       }
+   }
 
-// 页面加载完成后初始化
-document.addEventListener('DOMContentLoaded', () => {
-    // 初始状态不显示分类，等待性别选择
-    document.getElementById('game-screen').classList.add('hidden');
-});
-    </script>
-</body>
-</html>
+   // 更新单层服装
+   function updateItemLayer(layerId, itemId) {
+       const layer = document.getElementById(layerId);
+       if (itemId && itemId !== 'none') {
+           const item = clothingItems[layerId].find(i => i.id
+   === itemId);
+           if (item) {
+               layer.innerHTML = item.svg;
+               layer.style.display = 'block';
+           }
+       } else {
+           layer.innerHTML = '';
+           layer.style.display = 'none';
+       }
+   }
+
+   // 显示分类
+   function showCategory(category) {
+       currentCategory = category;
+
+       // 更新标签状态
+       document.querySelectorAll('.tab-btn').forEach(btn => {
+           btn.classList.remove('active');
+           if (btn.dataset.category === category) {
+               btn.classList.add('active');
+           }
+       });
+
+       // 显示分类中的物品
+       const itemsGrid =
+   document.getElementById('items-grid');
+       itemsGrid.innerHTML = '';
+
+       const items = clothingItems[category];
+       items.forEach(item => {
+           const itemCard = document.createElement('div');
+           itemCard.className = 'item-card';
+           if (selectedItems[category] === item.id) {
+               itemCard.classList.add('selected');
+           }
+
+           // 创建预览SVG
+           let previewSvg = '';
+           if (item.svg) {
+               previewSvg = `<svg viewBox="0 0 300 400">
+   ${item.svg}</svg>`;
+           } else {
+               previewSvg = `<svg viewBox="0 0 60 60">
+                   <circle cx="30" cy="30" r="25" fill=
+   "#f0f0f0" stroke="#ddd" stroke-width="2"/>
+                   <text x="30" y="35" text-anchor="middle"
+   fill="#999" font-size="20">×</text>
+               </svg>`;
+           }
+
+           itemCard.innerHTML = `
+               ${previewSvg}
+               <span>${item.name}</span>
+           `;
+
+           itemCard.addEventListener('click', () =>
+   selectItem(category, item.id));
+           itemsGrid.appendChild(itemCard);
+       });
+   }
+
+   // 选择物品
+   function selectItem(category, itemId) {
+       selectedItems[category] = itemId;
+
+       // 如果选择了连衣裙，清空上衣和裤子
+       if (category === 'dress' && itemId !== 'none') {
+           selectedItems.top = null;
+           selectedItems.bottom = null;
+       }
+
+       // 如果选择了上衣或裤子，清空连衣裙
+       if ((category === 'top' || category === 'bottom') &&
+   itemId !== 'none') {
+           selectedItems.dress = null;
+       }
+
+       // 更新角色外观
+       updateAllClothing();
+
+       // 重新显示当前分类以更新选中状态
+       showCategory(category);
+   }
+
+   // 初始化标签点击事件
+   document.querySelectorAll('.tab-btn').forEach(btn => {
+       btn.addEventListener('click', () => {
+           const category = btn.dataset.category;
+           showCategory(category);
+       });
+   });
+
+   // 页面加载完成后初始化
+   document.addEventListener('DOMContentLoaded', () => {
+       // 初始状态不显示分类，等待性别选择
+
+   document.getElementById('game-screen').classList.add('hidde
+   n');
+   });
+       </script>
+   </body>
+   </html>
